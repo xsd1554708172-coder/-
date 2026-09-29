@@ -1,0 +1,34 @@
+name: Generate temporary DOCX files
+
+on:
+  push:
+    branches:
+      - chatgpt-docx-temp-20260930
+    paths:
+      - generate_docs.py
+      - .github/workflows/generate-docx.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependency
+        run: pip install python-docx
+      - name: Generate Word files
+        run: python generate_docs.py
+      - name: Commit generated documents
+        run: |
+          git config user.name "docx-generator"
+          git config user.email "actions@users.noreply.github.com"
+          git add output/*.docx
+          git commit -m "Generate Word documents [skip ci]"
+          git push
